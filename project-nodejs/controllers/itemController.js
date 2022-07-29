@@ -49,7 +49,7 @@ const getAllItems = async (req,res) => {
             where: {
                itemStatus : 1 
             },
-            order: [[ 'itemId', 'DESC' ]],
+            order: [[ 'itemId', 'DESC' ]],  //list items in latest posted view
             limit, offset
 
         })
@@ -87,6 +87,7 @@ const getAllItems = async (req,res) => {
                 item_CatId : category,
                 itemStatus : 1
             },
+            order: [[ 'itemId', 'DESC' ]],
             limit, offset
         })
 
@@ -120,6 +121,7 @@ const getAllItems = async (req,res) => {
                 itemName : {[Sequelize.Op.like]: `%${name}%`},
                 itemStatus : 1
             },
+            order: [[ 'itemId', 'DESC' ]],
             limit, offset
         })
 
@@ -153,6 +155,7 @@ const getAllItems = async (req,res) => {
                 item_CityId : city, 
                 itemStatus : 1
             },
+            order: [[ 'itemId', 'DESC' ]],
             limit, offset
         })
 
@@ -188,6 +191,7 @@ const getAllItems = async (req,res) => {
                 itemName : {[Sequelize.Op.like]: `%${name}%`},
                 itemStatus : 1
             },
+            order: [[ 'itemId', 'DESC' ]],  //list items in latest posted view
             limit, offset
         })
 
@@ -222,6 +226,7 @@ const getAllItems = async (req,res) => {
                 itemName : {[Sequelize.Op.like]: `%${name}%`},
                 itemStatus : 1
             },
+            order: [[ 'itemId', 'DESC' ]],  //list items in latest posted view
             limit, offset
         })
 
@@ -256,6 +261,7 @@ const getAllItems = async (req,res) => {
                 item_CityId : city,
                 itemStatus : 1
             },
+            order: [[ 'itemId', 'DESC' ]],  //list items in latest posted view
             limit, offset
         })
 
@@ -291,6 +297,7 @@ const getAllItems = async (req,res) => {
                 item_CityId : city,
                 itemStatus : 1
             },
+            order: [[ 'itemId', 'DESC' ]],  //list items in latest posted view
             limit, offset
         })
 
@@ -445,7 +452,7 @@ const getItemDetails = async(req,res) => {
                 model: ItemImage,
                 as: 'item_Image',
                 attributes:[
-                    'imgName' // in the front end split the string to an array and seperately get the images
+                    'imgName' 
                 ],
                 where:{
                     imgStatus: 1
@@ -635,7 +642,7 @@ const UnpublishItem = async (req,res ) => {
     //add item-seller
     const AddItem = async (req,res) => {
 
-        const {itemName,itemCategory,itemCondition,itemPrice,itemDescription,itemCity} = req.body  //itemContact not in my item table
+        const {itemName,itemCategory,itemCondition,itemPrice,itemDescription,itemCity} = req.body  
 
         const itemImages = req.files
 
@@ -701,7 +708,7 @@ const UnpublishItem = async (req,res ) => {
 
             const newImage = await ItemImage.create({
 
-                img_ItemId: getItemId.itemId, //ask which id used here second one item table item id (guess)
+                img_ItemId: getItemId.itemId, 
                 imgName: itemImgs.toString(),
                 imgStatus: 1
             })
@@ -713,7 +720,7 @@ const UnpublishItem = async (req,res ) => {
     //edit item post-seller
     const EditItem = async (req,res) => {
 
-        const {itemName,itemCategory,itemCondition,itemPrice,itemDescription,itemCity} = req.body //itemContact not in my item table
+        const {itemName,itemCategory,itemCondition,itemPrice,itemDescription,itemCity} = req.body 
 
         const itemImages = req.files
 
@@ -769,7 +776,6 @@ const UnpublishItem = async (req,res ) => {
             item_ConditionId: itemCondition,
             itemPrice: itemPrice,
             item_CityId: itemCity,
-            //itemContact: itemContact,
             itemDescription: itemDescription,
             itemStatus: 1
         },{
@@ -784,7 +790,7 @@ const UnpublishItem = async (req,res ) => {
                 imgStatus: 0
             },{
                where: {
-                img_ItemId : foundItem.itemId, //ask correct itemid
+                img_ItemId : foundItem.itemId, 
                 imgStatus : 1
                } 
             })
@@ -803,7 +809,7 @@ const UnpublishItem = async (req,res ) => {
 
     const delImgs = async ( req,res) =>{
 
-        const itemId = req.query.itemId //chek here used itemid/img tble itemid
+        const itemId = req.query.itemId 
         const token = req.cookies.jwt
         let sellerEmail 
 
@@ -838,7 +844,7 @@ const UnpublishItem = async (req,res ) => {
                 imgStatus: 1
             }
         })
-        res.redirect('/account/edit?itemId='+foundItem.itemId) //check img_ItemId='+foundItem.itemId
+        res.redirect('/account/edit?itemId='+foundItem.itemId) 
     }
 
 

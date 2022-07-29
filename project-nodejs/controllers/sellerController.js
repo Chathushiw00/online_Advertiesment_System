@@ -49,7 +49,7 @@ const addNewSeller = async (req,res) => {
 
             //add new seller details
             const newSeller = await  Seller.create({
-                //user leftside values=sellerModel column names
+        
                 sellerName: sellerName,
                 sellerEmail: sellerEmail,
                 sellerPW:hashPW,

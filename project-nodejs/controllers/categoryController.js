@@ -5,9 +5,10 @@ const { sequelize, Sequelize } = require('../models')
 
 //create main Model
 const Category = db.categories
-const Item = db.items  
+const Item = db.items
 
-//main work
+
+//main work 
 
 //get all categories with count of items
 const getAllCategoriesWithCount = async (req,res) => {

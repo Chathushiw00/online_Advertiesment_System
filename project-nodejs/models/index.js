@@ -81,7 +81,7 @@ db.sellers.belongsTo(db.cities,{
 //cities has many items
 
 db.cities.hasMany(db.items,{
-    foreignKey: 'item_CityId', //add forign key to items table in cities->cityId
+    foreignKey: 'item_CityId', 
     as: 'item'
 })
 db.items.belongsTo(db.cities,{

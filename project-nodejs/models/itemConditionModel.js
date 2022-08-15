@@ -1,4 +1,6 @@
 
+//Defining ItemCondition Model
+
 module.exports = (sequelize, DataTypes) =>{
     const ItemCondition = sequelize.define("item_Condition",{
         conditionId: {

@@ -2,7 +2,7 @@
 const multer = require('multer')
 const path = require('path')
 
-
+//configuring storage path
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, "images/itemimages")
@@ -12,6 +12,7 @@ const storage = multer.diskStorage({
     }
 })
 
+//Defining upload object using multer with limits and supporting imgae file types 
 const upload = multer({
     storage: storage,
     limits: { fileSize: '5000000'},
@@ -28,7 +29,7 @@ const upload = multer({
     
 }).array('itemImages', 4)
 
-
+//pass data to account router
 module.exports = {
     upload
 }

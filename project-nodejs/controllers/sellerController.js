@@ -17,16 +17,14 @@ const ItemImage= db.item_images
 //time for cookie to be saved(3 days)
 const maxAge = 3 * 24 * 60 * 60
 
-
 //main work
-
 
 //register new seller
 const addNewSeller = async (req,res) => {
     const {sellerName,sellerEmail,sellerPassword,sellerCity,sellerContact} = req.body
     
 
-    //check all data is available
+    //check all data are available-validation
     if(!sellerName || !sellerEmail || !sellerPassword || !sellerCity || !sellerContact)
 
         return res.status(400).json({'message': 'All details are required!'})
@@ -56,6 +54,7 @@ const addNewSeller = async (req,res) => {
                 seller_CityId: sellerCity,
                 sellerContact: sellerContact
             },{fields : ['sellerName','sellerEmail','sellerPW','seller_CityId','sellerContact']})
+
             res.redirect('/login?success='+ encodeURIComponent('yes'))
         }catch (err)
         {
@@ -66,6 +65,8 @@ const addNewSeller = async (req,res) => {
 
 //seller Login
 const SellerLogin = async (req,res) => {
+   
+    //provide body data
     const {sellerEmail,sellerPassword} = req.body
 
     if(!sellerEmail || !sellerPassword) return res.status(400).json({'message': 'Email & Password are required'})
@@ -77,7 +78,6 @@ const SellerLogin = async (req,res) => {
     })
 
     if(!sellerFound)
-        //return res.redirect('/login?avail='+ encodeURIComponent('no'))
         return res.status(400).json({'message': 'Not Registered'})
 
         else{
@@ -88,10 +88,12 @@ const SellerLogin = async (req,res) => {
             {
                 const token = accessToken(sellerFound.sellerEmail)
                 res.cookie('jwt',token,{httpOnly: true, maxAge: maxAge*1000})
-                res.redirect('/account')
+                //res.redirect('/account')
+
+                res.json({ message: 'This is Seller Account Listings page',accessToken: token})
                 
             }else{
-                //res.redirect('/login?success='+ encodeURIComponent('no'))
+               
                 res.status(400).json({'message': 'Email and Password not match'})
             }
         }
@@ -117,7 +119,8 @@ const getSellerDetails = async (req,res) =>{
                     }
             })
         }else{
-            res.redirect('/login');
+            //res.redirect('/login');
+            return res.sendStatus(401)
         }
 
         if(!sellerEmail) return res.status(400).json({ 'message' : 'User not logged in'})
@@ -149,13 +152,12 @@ const getSellerDetails = async (req,res) =>{
     }
 
 
-    //get seller details to the seller profile-normal user clicked item-seller details
-
+    //get seller details to the seller profile- normal user clicked 
     const getSellerInfo = async (req,res) => {
-        
+        //request variable sellerid
         const sellerId = req.query.sellerId
 
-        if(!sellerId) return res.status(400).json({'message' : 'provide aaa sellerId'})
+        if(!sellerId) return res.status(400).json({'message' : 'provide a sellerId'})
 
         const sellerFound = await Seller.findOne({
             include:[{
@@ -204,7 +206,6 @@ const getSellerDetails = async (req,res) =>{
             where: {
                 itemStatus : 1,
                 item_SellerId : sellerId
-                  //sellerId : sellerId 
             }
         })
 
@@ -223,10 +224,10 @@ const getSellerDetails = async (req,res) =>{
     }
 
 
-
     //update sellerDetails
     const UpdateSellerDetails = async (req,res) => {
-
+        
+        //form-data to add
         const {sellerName,sellerContact,sellerCity,sellerEmail,sellerConfirmPassword,sellerCurrentPassword} = req.body
 
 
@@ -246,7 +247,8 @@ const getSellerDetails = async (req,res) =>{
         })
 
     }else{
-        res.redirect('/login');
+        //res.redirect('/login');
+        return res.sendStatus(401)
     }
 
 

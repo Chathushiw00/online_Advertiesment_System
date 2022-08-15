@@ -22,15 +22,18 @@ const getAllItems = async (req,res) => {
     let category = req.query.category
     let city =req.query.city
 
+    //get all cities and categories
     const cat = await Category.findAll()
     const cty = await City.findAll()
 
+    //pagination
     const { page, size } = req.query;
     const { limit, offset } = getPagination(page, size);
 
+    //no req. values 
     if(!category && !name && !city){
+        
         //get all items
-
         const item = await Item.findAndCountAll({
             include:[{
                 model: Category,
@@ -63,6 +66,7 @@ const getAllItems = async (req,res) => {
             data : pagitem
         })
 
+        //only give category request
     }else if(category && !name && !city){
 
         //get items by category
@@ -98,6 +102,7 @@ const getAllItems = async (req,res) => {
             cities: cty,
             data : pagitem
         })
+        //only give name request
     }else if(!category && name && !city){
 
         //get items by name
@@ -132,6 +137,7 @@ const getAllItems = async (req,res) => {
             cities: cty,
             data : pagitem
         })
+        //only give city request
     }else if(!category && !name && city){
 
         //get items by city
@@ -226,7 +232,7 @@ const getAllItems = async (req,res) => {
                 itemName : {[Sequelize.Op.like]: `%${name}%`},
                 itemStatus : 1
             },
-            order: [[ 'itemId', 'DESC' ]],  //list items in latest posted view
+            order: [[ 'itemId', 'DESC' ]],  
             limit, offset
         })
 
@@ -261,7 +267,7 @@ const getAllItems = async (req,res) => {
                 item_CityId : city,
                 itemStatus : 1
             },
-            order: [[ 'itemId', 'DESC' ]],  //list items in latest posted view
+            order: [[ 'itemId', 'DESC' ]],  
             limit, offset
         })
 
@@ -297,7 +303,7 @@ const getAllItems = async (req,res) => {
                 item_CityId : city,
                 itemStatus : 1
             },
-            order: [[ 'itemId', 'DESC' ]],  //list items in latest posted view
+            order: [[ 'itemId', 'DESC' ]],  
             limit, offset
         })
 
@@ -318,10 +324,11 @@ const postSearchItems = (req,res) =>{
     let category = req.body.category
     let city = req.body.city
 
-    
+    //no form-data for this
     if(!name && !category && !city)
         res.redirect(`/list`)
 
+    //below conditions have form-data
     else if(name && !category && !city)
         res.redirect(`/list?name=${name}`)
 
@@ -340,6 +347,7 @@ const postSearchItems = (req,res) =>{
     else if(!name &&  category && city)
         res.redirect(`/list?category=${category}&city=${city}`)
 
+        //form-data given for name,city,category
     else
         res.redirect(`/list?name=${name}&category=${category}&city=${city}`)
 }
@@ -350,6 +358,8 @@ const getAllItemsBySeller = async (req,res) => {
 
     const token = req.cookies.jwt
     let sellerEmail
+
+    //get seller email form token
     if(token){
         jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decodedToken) =>{
             if(err){
@@ -364,6 +374,7 @@ const getAllItemsBySeller = async (req,res) => {
 
     if(!sellerEmail) return res.status(400).json({'message': 'user not logged in'});
 
+    //check for a user belong to the token
     const sellerFound = await Seller.findOne({
         where:{
             sellerEmail : sellerEmail
@@ -371,8 +382,9 @@ const getAllItemsBySeller = async (req,res) => {
     })
 
 
-    if(!sellerFound) return res.sendStatus(403); //forbidden //it logged in seller didn't have any items
+    if(!sellerFound) return res.sendStatus(403); //forbidden,if logged in seller didn't have any items
 
+    //get items belong to the user
     const item = await Item.findAll({
         include:[{
             model: Category,
@@ -390,14 +402,14 @@ const getAllItemsBySeller = async (req,res) => {
             model: ItemImage,
             as: 'item_Image',
             attributes:[
-                'imgName' // in the front end split the string and get only the first image as the main image
+                'imgName' 
             ],
             where: {
                 imgStatus: 1
             }
         } ],
             attributes:{
-                exclude: ['item_CatId','item_SellerId','item_ConditionId','item_CityId','itemDescription','itemStatus'] //here we not select this values
+                exclude: ['item_CatId','item_SellerId','item_ConditionId','item_CityId','itemDescription','itemStatus'] //excluding this values
             },
 
         where: {
@@ -416,7 +428,7 @@ const getAllItemsBySeller = async (req,res) => {
     }
 }
 
-//get item by itemId-seller
+//get item by itemId to edit-seller
 const getItemDetails = async(req,res) => {
     
     const itemId = req.query.itemId
@@ -424,6 +436,7 @@ const getItemDetails = async(req,res) => {
     const token = req.cookies.jwt
     let sellerEmail
 
+     //getting seller email from the token
     if(token){
         jwt.verify(token,process.env.ACCESS_TOKEN_SECRET, async (err, decodedToken) =>{
                 if(err){
@@ -438,6 +451,7 @@ const getItemDetails = async(req,res) => {
 
     if(!sellerEmail) return res.status(400).json({ 'message' : 'User not logged in'})
 
+     //checking for seller with the token
     const sellerFound = await Seller.findOne({
         where:{
             sellerEmail : sellerEmail
@@ -446,6 +460,7 @@ const getItemDetails = async(req,res) => {
 
     if(!sellerFound) return res.sendStatus(403) //forbidden-->if logged user didn't list any item shows this
 
+    //get the item that belongs to the seller
     const item = await Item.findOne({
         include:[
             {
@@ -466,13 +481,15 @@ const getItemDetails = async(req,res) => {
         }
     })
 
+    
+    if(!item) return res.sendStatus(403)
+
+    //get categories,cities,itemconditions
     const category = await Category.findAll()
     const itmCondition = await ItemCondition.findAll()
     const city = await City.findAll()
 
-
-    if(!item) return res.sendStatus(403)
-
+    //get item-city name
     const foundCity = await City.findOne({
         where: {
             cityId : item.item_CityId
@@ -485,7 +502,7 @@ const getItemDetails = async(req,res) => {
         cities : city,
         item : item,
         details: {
-            contact: item.itemContact, //here shows logged seller contact and city
+            contact: item.itemContact, 
             city : foundCity.cityName
         }
     })
@@ -495,10 +512,13 @@ const getItemDetails = async(req,res) => {
 //get item information to normal user
 
 const getItemInformation = async ( req,res) => {
+    
+    //request variable to get the item
     const itemId = req.query.itemId
 
     if(!itemId) return res.status(400).json({ 'message' : 'Specify an item id'})
 
+    //get the relavent item
     const item = await Item.findOne({
          include: [{
             model: Seller,
@@ -535,6 +555,7 @@ const getItemInformation = async ( req,res) => {
 //get-add item page necessary data-seller
 
 const getAddItemNecessary = async (req,res) => {
+    //get the access token from cookies
     const token = req.cookies.jwt
     let sellerEmail
 
@@ -552,6 +573,7 @@ const getAddItemNecessary = async (req,res) => {
 
 if(!sellerEmail) return res.status(400).json({ 'message' : 'User not logged in'})
    
+//get seller details to put default values to the drop down lists
 const sellerFound = await Seller.findOne({
     where: {
         sellerEmail : sellerEmail
@@ -561,12 +583,14 @@ const sellerFound = await Seller.findOne({
 
 if(!sellerFound) return res.sendStatus(403) //Forbidden
 
+  //getting the seller's city to put to the drop down as default value
 const foundCity = await City.findOne({
     where: {
         cityId: sellerFound.seller_CityId
     }
 })
 
+//getting category, city and itemconditions to the drop down lists
 const category = await Category.findAll()
 const itmCondition = await ItemCondition.findAll()
 const city = await City.findAll()
@@ -587,7 +611,7 @@ res.status(200).send({
 //get unpublished item by itemid-seller
 
 const UnpublishItem = async (req,res ) => {
-
+    //request variable
     const itemId = req.query.itemId
 
     const token =req.cookies.jwt
@@ -616,6 +640,7 @@ const UnpublishItem = async (req,res ) => {
 
     if(!sellerFound) return res.sendStatus(403) //Forbidden
 
+    //getting item that belngs to the user
     const item =  await Item.findOne({
         where: {
             itemId : itemId,
@@ -627,6 +652,7 @@ const UnpublishItem = async (req,res ) => {
 
     if(!item) return res.sendStatus(403)
     
+     //removing item by updating the itemstatus as 0
     const remItem = await Item.update({
         itemStatus :0
     },{
@@ -636,24 +662,28 @@ const UnpublishItem = async (req,res ) => {
         }
     })
     
-    res.redirect('/account')  
+    //res.redirect('/account')  
+    return res.status(400).json({'message': 'Item successfully deleted!'})
 }
     
     //add item-seller
     const AddItem = async (req,res) => {
 
+        //requsting form-data and files
         const {itemName,itemCategory,itemCondition,itemPrice,itemDescription,itemCity} = req.body  
 
         const itemImages = req.files
 
         let itemImgs = []
 
+         //if itemImages exist
         if(itemImages){
             for(var count=0; count<itemImages.length; count++){
                 itemImgs[count] = itemImages[count].path
             }
         }
-
+        
+        //if not all information are given
     if(!itemName || !itemCategory || !itemCondition || !itemPrice || !itemDescription || !itemCity)
         return res.status(400).json({'message': 'All Details are required'})
 
@@ -685,6 +715,7 @@ const UnpublishItem = async (req,res ) => {
 
         const dt = formatDate(new Date()).toString() //set the date of item listed
 
+        //add new item
         const newItem = await Item.create({
             item_CatId: itemCategory,
             item_SellerId: sellerFound.sellerId,
@@ -693,7 +724,6 @@ const UnpublishItem = async (req,res ) => {
             itemPrice: itemPrice,
             itemDateTime: dt,
             item_CityId: itemCity,
-            //itemContact: itemContact,
             itemDescription: itemDescription,
             itemStatus: 1
 
@@ -706,6 +736,7 @@ const UnpublishItem = async (req,res ) => {
                 order: [[ 'itemId', 'DESC' ]]
             })
 
+            //add itemImage to the item_image table in db
             const newImage = await ItemImage.create({
 
                 img_ItemId: getItemId.itemId, 
@@ -713,25 +744,28 @@ const UnpublishItem = async (req,res ) => {
                 imgStatus: 1
             })
 
-        res.redirect('/account')
+        res.json({ message: 'New Item successfully Added'})
+        //res.redirect('/account')
     }
 
 
     //edit item post-seller
     const EditItem = async (req,res) => {
 
+        //getting form-data and files
         const {itemName,itemCategory,itemCondition,itemPrice,itemDescription,itemCity} = req.body 
 
         const itemImages = req.files
 
         let itemImgs = []
 
+        //checking if any itemImages are uploaded
         if(itemImages){
             for(var count=0; count<itemImages.length; count++){
                 itemImgs[count] = itemImages[count].path
             }
         }
-
+//check all information are provided - validation
     if(!itemName || !itemCategory || !itemCondition || !itemPrice || !itemDescription || !itemCity)
         return res.status(400).json({'message': 'All details are required'})
 
@@ -759,8 +793,9 @@ const UnpublishItem = async (req,res ) => {
             }
         })
 
-        if(!sellerFound) return res.sendStatus(403) //Forbidden
+        if(!sellerFound) return res.sendStatus(403) 
 
+         //get the existing item
         const foundItem= await Item.findOne({
             where: {
                 itemId : itemId,
@@ -768,8 +803,8 @@ const UnpublishItem = async (req,res ) => {
             }
         })
 
-        if(!foundItem) return res.sendStatus(403) //Forbidden
-
+        if(!foundItem) return res.sendStatus(403) 
+        //updating the item details
         const updateItem = await Item.update({
             item_CatId: itemCategory,
             itemName: itemName,
@@ -784,8 +819,18 @@ const UnpublishItem = async (req,res ) => {
                 item_SellerId : sellerFound.sellerId
             }
         })
-
+//updating the itemimages if there are new images
         if(itemImages){
+
+            const findImg = await ItemImage.findOne({
+                where:{
+                    img_ItemId : foundItem.itemId,
+                    imgName : '',
+                    imgStatus: 1
+                }
+            })
+            
+            if(!findImg){
             const currImgs = await ItemImage.update({
                 imgStatus: 0
             },{
@@ -800,13 +845,27 @@ const UnpublishItem = async (req,res ) => {
                 imgName: itemImgs.toString(),
                 imgStatus: 1
             })
-        }
+        }else{
+            const newImgs = await ItemImage.update({
+                img_ItemId: foundItem.itemId,
+                imgName: itemImgs.toString(),
+                imgStatus: 1
+
+                },{where:{
+                    img_ItemId : foundItem.itemId,
+                    imgName : '',
+                    imgStatus: 1
+                }
+            })
+       }
+    }
     
         res.redirect('/account')
-    }
+        //return res.status(400).json({'message': 'item edit success'})
+}
+
 
     //remove item imgaes-seller
-
     const delImgs = async ( req,res) =>{
 
         const itemId = req.query.itemId 
@@ -844,7 +903,15 @@ const UnpublishItem = async (req,res ) => {
                 imgStatus: 1
             }
         })
-        res.redirect('/account/edit?itemId='+foundItem.itemId) 
+
+        const updImg = await ItemImage.create({
+            img_ItemId: foundItem.itemId,
+            imgName: '',
+            imgStatus: 1
+        })
+
+        res.json({ message: 'Item Image successfully deleted'})
+        //res.redirect('/account/edit?itemId='+foundItem.itemId) 
     }
 
 
@@ -870,6 +937,7 @@ const UnpublishItem = async (req,res ) => {
 
 }
 
+//pagination setup
 const getPagination = (page, size) => {
     const limit = size ? +size : 10;
     const offset = page ? page * limit : 0;

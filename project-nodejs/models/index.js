@@ -1,4 +1,6 @@
 
+//Defining Database Object
+
 //imports
 const database = require('../config/database');
 

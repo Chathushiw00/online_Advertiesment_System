@@ -5,7 +5,7 @@ const router = require('express').Router()
 
 //get Categories with item count
 
-router.route('/') //get-(done)
+router.route('/') 
     .get(categoryController.getAllCategoriesWithCount)
 
 

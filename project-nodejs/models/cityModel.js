@@ -1,4 +1,6 @@
 
+//Defining City Model
+
 module.exports = (sequelize, DataTypes) =>{
     const City = sequelize.define("city",{
         cityId: {

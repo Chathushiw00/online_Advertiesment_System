@@ -1,4 +1,6 @@
 
+//define category model
+
 module.exports = (sequelize, DataTypes) =>{
     //define models should be singulars
     const Category = sequelize.define("category",{

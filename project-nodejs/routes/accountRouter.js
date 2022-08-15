@@ -5,12 +5,12 @@ const sellerController = require('../controllers/sellerController')
 const itemImageMiddleware = require('../middleware/itemImageUpload')
 const router = require('express').Router()
 
-router.route('/')//get-(done)
+router.route('/')
 //get all listings of the seller
 .get(itemController.getAllItemsBySeller)    //get itemImage using association
 
 
-router.route('/add')//-get()-done -post-(done)
+router.route('/add')
 
 //add listing--get categories,itemconditions,cities,sellerContact,sellerCity
 .get(itemController.getAddItemNecessary)
@@ -20,7 +20,7 @@ router.route('/add')//-get()-done -post-(done)
 
 
 
-router.route('/edit')//get-(done)   -post-(done)
+router.route('/edit')
 //edit listing-- get itemCity
 .get(itemController.getItemDetails) // get itemImage using association
 
@@ -29,19 +29,19 @@ router.route('/edit')//get-(done)   -post-(done)
 
 
 router.route('/edit/delimgs')
-//delete item imges
+//edit/delete item imges
     .get(itemController.delImgs)
 
 
 
-router.route('/delete')//get-(done)
+router.route('/delete')
 
 //delete or unpublish listing   delete?itemId=(give itemId)
 .get(itemController.UnpublishItem)
 
 
 
-router.route('/settings')//get-(done)   post()-done
+router.route('/settings')
 
 //get seller details
 .get(sellerController.getSellerDetails)

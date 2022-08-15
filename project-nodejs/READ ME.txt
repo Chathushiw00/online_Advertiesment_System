@@ -1,0 +1,22 @@
+
+
+   Online Advertisement management system-REST API
+------------------------------------------------------------
+
+this applications developed by using javascript,node js & mysql technologies
+
+main objectives of this system,
+
+	-this application contains only the back end part
+
+	-sample online platform of buying and selling products
+
+	-used npm modules,
+		-Express (express - npm (npmjs.com))
+		-mysql2 - sequelize (sequelize - npm (npmjs.com))
+		-Jsonwebtoken (jsonwebtoken - npm (npmjs.com))
+		-ENV file handling (dotenv - npm (npmjs.com))
+		-multer file uploading (multer - npm (npmjs.com)
+		-bcrypt-password encript
+	-use MVC folders for better data/file handling
+
